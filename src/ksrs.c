@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <termios.h>
+#include "cards.h"
 
-char getch()
-{
+char getch() {
 	struct termios old, new;
 
+	/* Temporarily changing terminal to read single chars without enter */
 	tcgetattr(0, &old);
 	new = old;
 	new.c_lflag &= ~ICANON;
@@ -18,10 +19,16 @@ char getch()
 	return ch;
 }
 
-int main()
-{
-	printf("Press any key\n");
-	char c = getch();
-	printf("%c\n", c);
+int main() {
+	puts("Press any key");
+
+	while (1) {
+		char c = getch();
+		if (c == 3) {
+			break;
+		}
+		printf("%c\n", c);
+	}
+
 	return 0;
 }

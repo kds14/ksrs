@@ -20,7 +20,10 @@ char getch() {
 }
 
 int main() {
-	puts("Press any key");
+	printf("Press any key\n");
+
+	read_deck("../ksrs/build/deck.txt");
+	print_deck(deckptr);
 
 	while (1) {
 		char c = getch();

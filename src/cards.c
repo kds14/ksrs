@@ -38,11 +38,21 @@ void add_card(struct card *card) {
 void print_deck(struct deck *deck) {
 	for (int i = 0; i < deck->size; i++) {
 		printf("Card %d:\n", i);
-		printf("Front: %s\n", deck->cards[i].front);
-		printf("Back: %s\n", deck->cards[i].back);
-		printf("Interval: %d\n", deck->cards[i].interval);
-		printf("RevDay: %lu\n", (unsigned long)deck->cards[i].revday);
+		print_card(&deck->cards[i]);
 	}
+}
+
+void print_card(struct card *card) {
+	printf("Front: %s\n", card->front);
+	printf("Back: %s\n", card->back);
+	printf("Interval: %d\n", card->interval);
+	printf("Correct: %d\n", card->correct);
+
+	char *buff = malloc(sizeof(char)*100);
+	struct tm *timeptr = localtime(&card->revday);
+	strftime(buff, 100, "%b %d, %Y %H:%M", timeptr);
+	printf("RevDay: %s (%lu)\n", buff, (unsigned long)card->revday);
+	free(buff);
 }
 
 void read_deck(char *filestr) {
@@ -75,6 +85,11 @@ void read_deck(char *filestr) {
 					card->interval = i;
 					i = 0;
 					break;
+				case CRCT:
+					sscanf(buff, "%d", &i);
+					card->correct = i;
+					i = 0;
+					break;
 				case REVDAY:
 					sscanf(buff, "%lu", &l);
 					card->revday = (time_t)l;
@@ -82,6 +97,9 @@ void read_deck(char *filestr) {
 					break;
 			}
 			if (c == '\n') {
+				if (card->revday == 0) {
+					card->revday = time(0);
+				}
 				add_card(card);
 				next = FRONT;
 			}

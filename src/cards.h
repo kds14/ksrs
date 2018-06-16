@@ -6,6 +6,7 @@
 
 struct card {
 	int interval;
+	int correct;
 	time_t revday;
 	char *front;
 	char *back;
@@ -19,12 +20,13 @@ struct deck {
 
 struct deck *deckptr;
 
-enum next_read { FRONT, BACK, INT, REVDAY };
+enum next_read { FRONT, BACK, INT, CRCT, REVDAY };
 
 void read_deck(char *filestr);
 void write_deck(struct deck *deck);
 void print_deck(struct deck *deck);
 void print_deck();
+void print_card();
 
 void init_deck(int cap);
 void del_deck();

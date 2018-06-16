@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <termios.h>
 
 #include "cards.h"
@@ -22,15 +23,12 @@ char getch() {
 }
 
 int main() {
-	printf("Press any key\n");
+	printf("%s", "Press any key\n");
 
 	read_deck("../ksrs/build/deck.txt");
 
 	while (1) {
 		char c = getch();
-		if (c == 3) {
-			break;
-		}
 		printf("%c\n", c);
 	}
 

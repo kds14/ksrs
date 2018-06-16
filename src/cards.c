@@ -5,7 +5,7 @@
 
 void init_deck(int cap) {
 	deckptr = malloc(sizeof(struct deck));
-	deckptr->cards = malloc(cap * sizeof(struct card *));
+	deckptr->cards = malloc(cap * sizeof(struct card));
 	deckptr->cap = cap;
 	deckptr->size = 0;
 }
@@ -21,15 +21,17 @@ void del_deck() {
 
 void add_card(struct card *card) {
 	struct card c = *card;
+	//memcpy(&c, card, sizeof(c));
 
 	if (deckptr->size >= deckptr->cap) {
-		struct card *temp = malloc(deckptr->cap * sizeof(struct card *));
-		memcpy(temp, deckptr->cards, sizeof(struct card) * deckptr->size);
 		deckptr->cap *= 2;
+		struct card *temp = malloc(deckptr->cap * sizeof(struct card));
+		memcpy(temp, deckptr->cards, sizeof(struct card) * deckptr->size);
 		free(deckptr->cards);
-		deckptr->cards = malloc(deckptr->cap * sizeof(struct card *));
-		memcpy(deckptr->cards, temp, sizeof(struct card) * deckptr->size);
-		free(temp);
+		//deckptr->cards = malloc(deckptr->cap * sizeof(struct card *));
+		//memcpy(deckptr->cards, temp, sizeof(struct card) * deckptr->size);
+		//free(temp);
+		deckptr->cards = temp;
 	}
 
 	deckptr->cards[deckptr->size++] = c;
@@ -72,9 +74,9 @@ void read_deck(char *filestr) {
 		if (c == '\t' || c == '\n') {
 			switch (next++) {
 				case FRONT:
-					card = malloc(sizeof(card));
+					card = malloc(sizeof(struct card));
 					card->front = malloc(sizeof(char) * count);
-					memcpy(card->front, buff, count*sizeof(char));
+					memcpy(card->front, buff, count * sizeof(char));
 					break;
 				case BACK:
 					card->back = malloc(sizeof(char) * count);
@@ -101,6 +103,7 @@ void read_deck(char *filestr) {
 					card->revday = time(0);
 				}
 				add_card(card);
+				free(card);
 				next = FRONT;
 			}
 			memset(buff, 0, sizeof(buff));

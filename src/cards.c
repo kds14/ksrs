@@ -2,39 +2,29 @@
 #include <stdio.h>
 
 #include "cards.h"
+#include "reps.h"
 
 void init_deck(int cap) {
-	deckptr = malloc(sizeof(struct deck));
-	deckptr->cards = malloc(cap * sizeof(struct card));
+	deckptr = calloc(1, sizeof(struct deck));
+	deckptr->cards = calloc(cap, sizeof(struct card *));
 	deckptr->cap = cap;
 	deckptr->size = 0;
 }
 
-void del_deck() {
-	for (int i = 0; i < deckptr->size; i++) {
-		free(deckptr->cards[i].front);
-		free(deckptr->cards[i].back);
-	}
-	free(deckptr->cards);
-	free(deckptr);
-}
-
+/*
+ * Adds a card to the current deck and the rep queue if
+ * it is due.
+ */
 void add_card(struct card *card) {
-	struct card c = *card;
-	//memcpy(&c, card, sizeof(c));
 
-	if (deckptr->size >= deckptr->cap) {
+	if (deckptr->size + 1 >= deckptr->cap) {
 		deckptr->cap *= 2;
-		struct card *temp = malloc(deckptr->cap * sizeof(struct card));
-		memcpy(temp, deckptr->cards, sizeof(struct card) * deckptr->size);
+		struct card **temp = calloc(deckptr->cap, sizeof(struct card *));
+		memcpy(temp, deckptr->cards, deckptr->size * sizeof(struct card *));
 		free(deckptr->cards);
-		//deckptr->cards = malloc(deckptr->cap * sizeof(struct card *));
-		//memcpy(deckptr->cards, temp, sizeof(struct card) * deckptr->size);
-		//free(temp);
 		deckptr->cards = temp;
 	}
-
-	deckptr->cards[deckptr->size++] = c;
+	deckptr->cards[deckptr->size++] = card;
 }
 
 void print_deck(struct deck *deck) {
@@ -57,6 +47,9 @@ void print_card(struct card *card) {
 	free(buff);
 }
 
+/*
+ * Reads all card data from a deck file and adds them to the deck.
+ */
 void read_deck(char *filestr) {
 	FILE *fp = fopen(filestr, "r");
 	char buff[512];
@@ -68,42 +61,71 @@ void read_deck(char *filestr) {
 
 	char c;
 	int count = 0;
+	char *num_buff;
 	while ((c = fgetc(fp)) != EOF) {
 		int i = 0;
 		unsigned long int l = 0;
 		if (c == '\t' || c == '\n') {
+			/*if ((next == FRONT || next == BACK) && c == '\n') {
+				memset(buff, 0, sizeof(buff));
+				count = 0;
+				continue;
+			}*/
 			switch (next++) {
 				case FRONT:
-					card = malloc(sizeof(struct card));
-					card->front = malloc(sizeof(char) * count);
-					memcpy(card->front, buff, count * sizeof(char));
+					card = calloc(1, sizeof(struct card));
+					card->back = 0;
+					card->revday = 0;
+					card->interval = 0;
+					card->correct = 0;
+					card->front = 0;
+					if (count > 0) {
+						card->front = malloc(strlen(buff) + 1);
+						memcpy(card->front, buff, strlen(buff) + 1);
+					}
 					break;
 				case BACK:
-					card->back = malloc(sizeof(char) * count);
-					memcpy(card->back, buff, count * sizeof(char));
+					if (count > 0) {
+						card->back = malloc(strlen(buff) + 1);
+						memcpy(card->back, buff, strlen(buff) + 1);
+					}
 					break;
 				case INT:
-					sscanf(buff, "%d", &i);
+					//num_buff = malloc(count * sizeof(char));
+					num_buff = calloc(count, sizeof(char));
+					memcpy(num_buff, buff, count * sizeof(char));
+					sscanf(num_buff, "%d", &i);
 					card->interval = i;
 					i = 0;
+					free(num_buff);
 					break;
 				case CRCT:
-					sscanf(buff, "%d", &i);
+					num_buff = calloc(count, sizeof(char));
+					memcpy(num_buff, buff, count * sizeof(char));
+					sscanf(num_buff, "%d", &i);
 					card->correct = i;
 					i = 0;
+					free(num_buff);
 					break;
 				case REVDAY:
-					sscanf(buff, "%lu", &l);
+					num_buff = calloc(count, sizeof(char));
+					memcpy(num_buff, buff, count * sizeof(char));
+					sscanf(num_buff, "%lu", &l);
 					card->revday = (time_t)l;
 					l = 0;
+					free(num_buff);
 					break;
 			}
 			if (c == '\n') {
 				if (card->revday == 0) {
 					card->revday = time(0);
 				}
-				add_card(card);
-				free(card);
+				if (card->front == 0 || card->back == 0) {
+					printf("%s", "Failed to add card. Must have a front and back.");
+				}
+				else {
+					add_card(card);
+				}
 				next = FRONT;
 			}
 			memset(buff, 0, sizeof(buff));
@@ -111,5 +133,9 @@ void read_deck(char *filestr) {
 		} else {
 			buff[count++] = c;
 		}
+	}
+
+	for (int i = 0; i < deckptr->size; i++) {
+		add_rep_if_due(deckptr->cards[i]);
 	}
 }

@@ -5,6 +5,8 @@
 #include "cards.h"
 #include "reps.h"
 
+enum state { MAIN, REPS, ADD };
+
 char getch() {
 	struct termios old, new;
 
@@ -22,14 +24,68 @@ char getch() {
 	return ch;
 }
 
-int main() {
-	printf("%s", "Press any key\n");
+struct card *display_rep(int first) {
+	struct card *card = next_rep();
+	printf("%s\n", "------------");
+	if (card != 0) {
+		printf("%s\n", card->front);
+		printf("%s\n", "------------");
+	} else {
+		printf("%s\n", "No reps due!");
+	}
+	return card;
+}
 
+void display_back_rep(struct card *card) {
+	printf("%s\n", card->back);
+}
+
+int main() {
+	enum state state = MAIN;
 	read_deck("../ksrs/build/deck.txt");
+	printf("Reps due: %d\n", queue_count);
+	printf("%s\n", "Do reps (Q), Add card (W)");
+
+	/* Front = 0, Back = 1 */
+	int card_state = 0;
+
+	struct card *current;
 
 	while (1) {
 		char c = getch();
-		printf("%c\n", c);
+		switch (state) {
+			case MAIN:
+				if (c == 'Q' || c == 'q') {
+					if ((current = display_rep(1))) {
+						state = REPS;
+					}
+				} else if (c == 'W' || c == 'w') {
+					printf("%s\n", "Not yet implemented.");
+				}
+				break;
+			case REPS:
+				if (c == 'Q' || c == 'q' || c == 32) {
+					if (card_state) {
+						answer_card(RIGHT, current);
+						card_state = 0;
+						current = display_rep(0);
+						if (!current) {
+							state = MAIN;
+							continue;
+						}
+					} else {
+						display_back_rep(current);
+						card_state = 1;
+					}
+				} else if (card_state && (c == 'W' || c == 'w')) {
+					answer_card(WRONG, current);
+					card_state = 0;
+					current = display_rep(0);
+				}
+				break;
+			case ADD:
+				break;
+		}
 	}
 
 	return 0;

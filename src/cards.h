@@ -15,7 +15,7 @@ struct card {
 struct deck {
 	int cap;
 	int size;
-	struct card *cards;
+	struct card **cards;
 };
 
 struct deck *deckptr;

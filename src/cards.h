@@ -5,8 +5,7 @@
 #include <time.h>
 
 struct card {
-	int interval;
-	int correct;
+	int intsum;
 	time_t revday;
 	char *front;
 	char *back;
@@ -20,7 +19,7 @@ struct deck {
 
 struct deck *deckptr;
 
-enum next_read { FRONT, BACK, INT, CRCT, REVDAY };
+enum next_read { FRONT, BACK, INTSUM, REVDAY };
 
 void read_deck(char *filestr);
 void write_deck(struct deck *deck);

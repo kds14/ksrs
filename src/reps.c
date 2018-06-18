@@ -1,7 +1,6 @@
 #include <time.h>
 #include <stdio.h>
 
-
 #include "reps.h"
 
 struct node {
@@ -13,7 +12,7 @@ struct node {
 struct node *next_card;
 
 void add_rep(struct card *card);
-int next_interval(int correct, int interval);
+int next_interval(int intsum);
 
 int queue_count = 0;
 
@@ -62,12 +61,18 @@ struct card *next_rep() {
 	return result;
 }
 
-int next_interval(int correct, int interval) {
-	if (correct < 3) {
+int next_interval(int intsum) {
+	if (intsum < 3) {
 		return 1;
 	}
 	else {
-		return 1.3f * interval + 1;
+		int i = 1;
+		int sum = intsum - 3;
+		while (sum > 0) {
+			i = 1.3f * i + 1;
+			sum -= i;
+		}
+		return 1.3f * i + 1;
 	}
 }
 
@@ -77,14 +82,14 @@ int next_interval(int correct, int interval) {
  */
 void answer_card(enum answer ans, struct card *card) {
 	struct tm *timeptr = localtime(&card->revday);
+	int interval = 1;
 	if (ans == RIGHT) {
-		card->correct++;
-		card->interval = next_interval(card->correct, card->interval);
+		interval = next_interval(card->intsum);
+		card->intsum += interval;
 	} else {
-		card->interval = 1;
-		card->correct = 0;
+		card->intsum = 1;
 		add_rep(card);
 	}
-	timeptr->tm_mday +=  card->interval;
+	timeptr->tm_mday +=  interval;
 	card->revday = mktime(timeptr);
 }

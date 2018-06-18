@@ -37,8 +37,7 @@ void print_deck(struct deck *deck) {
 void print_card(struct card *card) {
 	printf("Front: %s\n", card->front);
 	printf("Back: %s\n", card->back);
-	printf("Interval: %d\n", card->interval);
-	printf("Correct: %d\n", card->correct);
+	printf("IntSum: %d\n", card->intsum);
 
 	char *buff = malloc(sizeof(char)*100);
 	struct tm *timeptr = localtime(&card->revday);
@@ -76,8 +75,7 @@ void read_deck(char *filestr) {
 					card = calloc(1, sizeof(struct card));
 					card->back = 0;
 					card->revday = 0;
-					card->interval = 0;
-					card->correct = 0;
+					card->intsum = 0;
 					card->front = 0;
 					if (count > 0) {
 						card->front = malloc(strlen(buff) + 1);
@@ -90,20 +88,12 @@ void read_deck(char *filestr) {
 						memcpy(card->back, buff, strlen(buff) + 1);
 					}
 					break;
-				case INT:
+				case INTSUM:
 					//num_buff = malloc(count * sizeof(char));
 					num_buff = calloc(count, sizeof(char));
 					memcpy(num_buff, buff, count * sizeof(char));
 					sscanf(num_buff, "%d", &i);
-					card->interval = i;
-					i = 0;
-					free(num_buff);
-					break;
-				case CRCT:
-					num_buff = calloc(count, sizeof(char));
-					memcpy(num_buff, buff, count * sizeof(char));
-					sscanf(num_buff, "%d", &i);
-					card->correct = i;
+					card->intsum = i;
 					i = 0;
 					free(num_buff);
 					break;

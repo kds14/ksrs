@@ -46,8 +46,13 @@ int main() {
 	printf("Reps due: %d\n", queue_count);
 	printf("%s\n", "Do reps (Q), Add card (W)");
 
-	/* Front = 0, Back = 1 */
-	int card_state = 0;
+	struct card *c = calloc(1, sizeof(struct card));
+	c->front = "REE";
+	c->back = "FREE";
+	c->intsum = 0;
+
+	enum card_state { FRONT, BACK };
+	enum card_state card_state = FRONT;
 
 	struct card *current;
 
@@ -67,7 +72,7 @@ int main() {
 				if (c == 'Q' || c == 'q' || c == 32) {
 					if (card_state) {
 						answer_card(RIGHT, current);
-						card_state = 0;
+						card_state = FRONT;
 						current = display_rep(0);
 						if (!current) {
 							state = MAIN;
@@ -75,11 +80,11 @@ int main() {
 						}
 					} else {
 						display_back_rep(current);
-						card_state = 1;
+						card_state = BACK;
 					}
 				} else if (card_state && (c == 'W' || c == 'w')) {
 					answer_card(WRONG, current);
-					card_state = 0;
+					card_state = FRONT;
 					current = display_rep(0);
 				}
 				break;

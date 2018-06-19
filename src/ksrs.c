@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <termios.h>
+#include <string.h>
 
 #include "cards.h"
 #include "reps.h"
 
 enum state { MAIN, REPS, ADD };
+char *deck_path;
 
 char getch() {
 	struct termios old, new;
@@ -40,19 +42,38 @@ void display_back_rep(struct card *card) {
 	printf("%s\n", card->back);
 }
 
-int main() {
-	enum state state = MAIN;
-	read_deck("../ksrs/build/deck.txt");
+void add_deck(char *deck_path) {
+	read_deck(deck_path);
 	printf("Reps due: %d\n", queue_count);
 	printf("%s\n", "Do reps (Q), Add card (W)");
+}
 
-	struct card *c = calloc(1, sizeof(struct card));
-	c->front = "REE";
-	c->back = "FREE";
-	c->intsum = 0;
+int main(int argc, char **argv) {
+
+	int deck = 0;
+	int df = 0;
+	for (int i = 0; i < argc; i++) {
+		if (deck == 0) {
+			deck_path = argv[i];
+			df = 1;
+		}
+		deck = strcmp(argv[i], "-d");
+	}
+
+	if (df) {
+		// TODO: prevent seg fault
+		add_deck(deck_path);
+	} else {
+		printf("%s", "No deck loaded. Please enter a deck path.\n");
+		exit(0);
+	}
+
+	enum state state = MAIN;
 
 	enum card_state { FRONT, BACK };
 	enum card_state card_state = FRONT;
+
+	int deck_written = 0;
 
 	struct card *current;
 
@@ -76,6 +97,10 @@ int main() {
 						current = display_rep(0);
 						if (!current) {
 							state = MAIN;
+							if (!deck_written) {
+								write_deck(deck_path, deckptr);
+								deck_written = 1;
+							}
 							continue;
 						}
 					} else {
@@ -92,6 +117,7 @@ int main() {
 				break;
 		}
 	}
+
 
 	return 0;
 }

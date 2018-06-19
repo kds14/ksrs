@@ -128,4 +128,15 @@ void read_deck(char *filestr) {
 	for (int i = 0; i < deckptr->size; i++) {
 		add_rep_if_due(deckptr->cards[i]);
 	}
+	fclose(fp);
+}
+
+void write_deck(char *filestr, struct deck *deck) {
+	FILE *fp = fopen(filestr, "w+");
+	for (int i = 0; i < deck->size; i++) {
+		struct card *card = deck->cards[i];
+		fprintf(fp, "%s\t%s\t%d\t%lu\n", card->front, card->back, card->intsum, (unsigned long)card->revday);
+	}
+	printf("%s", "Deck saved\n");
+	fclose(fp);
 }

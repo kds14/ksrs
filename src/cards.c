@@ -49,8 +49,11 @@ void print_card(struct card *card) {
 /*
  * Reads all card data from a deck file and adds them to the deck.
  */
-void read_deck(char *filestr) {
+int read_deck(char *filestr) {
 	FILE *fp = fopen(filestr, "r");
+	if (fp == 0) {
+		return 1;
+	}
 	char buff[512];
 	memset(buff, 0, sizeof(buff));
 	enum next_read next = FRONT;
@@ -129,6 +132,7 @@ void read_deck(char *filestr) {
 		add_rep_if_due(deckptr->cards[i]);
 	}
 	fclose(fp);
+	return 0;
 }
 
 void write_deck(char *filestr, struct deck *deck) {

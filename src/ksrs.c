@@ -42,15 +42,11 @@ void display_back_rep(struct card *card) {
 	printf("%s\n", card->back);
 }
 
-void add_deck(char *deck_path) {
-	read_deck(deck_path);
-	printf("Reps due: %d\n", queue_count);
-	printf("%s\n", "Do reps (Q), Add card (W)");
-}
-
+/*
+ * Spaced repition software
+ */
 int main(int argc, char **argv) {
-
-	int deck = 0;
+	int deck = 1;
 	int df = 0;
 	for (int i = 0; i < argc; i++) {
 		if (deck == 0) {
@@ -62,9 +58,16 @@ int main(int argc, char **argv) {
 
 	if (df) {
 		// TODO: prevent seg fault
-		add_deck(deck_path);
+		if (read_deck(deck_path)) {
+			printf("%s %s\n", "Failed to load deck at path:", deck_path);
+			exit(0);
+		}
+		else {
+			printf("Reps due: %d\n", queue_count);
+			printf("%s\n", "Do reps (Q), Add card (W)");
+		}
 	} else {
-		printf("%s", "No deck loaded. Please enter a deck path.\n");
+		printf("%s\n", "No deck loaded. Please enter a deck path.");
 		exit(0);
 	}
 

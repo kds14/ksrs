@@ -8,8 +8,13 @@
 
 enum state { MAIN, REPS, ADD };
 char *deck_path;
+enum get_state { REG, SING };
+enum get_state gs = SING;
 
 char getch() {
+	if (gs == REG) {
+		return getchar();
+	}
 	struct termios old, new;
 
 	/* Temporarily changing terminal to read single chars without enter */
@@ -57,7 +62,6 @@ int main(int argc, char **argv) {
 	}
 
 	if (df) {
-		// TODO: prevent seg fault
 		if (read_deck(deck_path)) {
 			printf("%s %s\n", "Failed to load deck at path:", deck_path);
 			exit(0);
@@ -75,6 +79,12 @@ int main(int argc, char **argv) {
 
 	enum card_state { FRONT, BACK };
 	enum card_state card_state = FRONT;
+	enum card_state add_state = FRONT;
+
+	char *input_buffer = calloc(1024, sizeof(char));
+	int input_count = 0;
+	char *front;
+	char *back;
 
 	int deck_written = 0;
 
@@ -89,7 +99,12 @@ int main(int argc, char **argv) {
 						state = REPS;
 					}
 				} else if (c == 'W' || c == 'w') {
-					printf("%s\n", "Not yet implemented.");
+					state = ADD;
+					add_state = FRONT;
+					printf("%s\n", "Add a card (C to cancel)");
+					printf("%s\n", "Input front:");
+					gs = REG;
+					continue;
 				}
 				break;
 			case REPS:
@@ -101,8 +116,11 @@ int main(int argc, char **argv) {
 						if (!current) {
 							state = MAIN;
 							if (!deck_written) {
-								write_deck(deck_path, deckptr);
-								deck_written = 1;
+								if (write_deck(deck_path, deckptr)) {
+									printf("%s\n", "Failed to write deck.");
+								} else {
+									deck_written = 1;
+								}
 							}
 							continue;
 						}
@@ -117,6 +135,47 @@ int main(int argc, char **argv) {
 				}
 				break;
 			case ADD:
+				if (c == 'C' || c == 'c') {
+					memset(input_buffer, 0, 1024 * sizeof(char));
+					if (front) {
+						free(front);
+					}
+					if (back) {
+						free(back);
+					}
+					continue;
+				}
+				switch (add_state) {
+					case FRONT:
+						if (c == 10) {
+							front = calloc(input_count, sizeof(char));
+							memcpy(front, input_buffer, input_count);
+							input_count = 0;
+							add_state = BACK;
+							printf("%s\n", "Input back:");
+						} else {
+							input_buffer[input_count++] = c;
+						}
+						break;
+					case BACK:
+						if (c == 10) {
+							back = calloc(input_count, sizeof(char));
+							memcpy(back, input_buffer, input_count);
+							create_card(front, back);
+							write_deck(deck_path, deckptr);
+							front = 0;
+							back = 0;
+							input_count = 0;
+							state = MAIN;
+							printf("Reps due: %d\n", queue_count);
+							printf("%s\n", "Do reps (Q), Add card (W)");
+						} else {
+							input_buffer[input_count++] = c;
+						}
+						gs = SING;
+						break;
+
+				}
 				break;
 		}
 	}

@@ -11,6 +11,17 @@ void init_deck(int cap) {
 	deckptr->size = 0;
 }
 
+// useless atm
+void create_card(char *front, char *back) {
+	struct card *card = calloc(1, sizeof(struct card));
+	card->front = front;
+	card->back = back;
+	card->intsum = 0;
+	card->revday = time(0);
+	add_card(card);
+	add_rep_if_due(card);
+}
+
 /*
  * Adds a card to the current deck and the rep queue if
  * it is due.
@@ -135,12 +146,16 @@ int read_deck(char *filestr) {
 	return 0;
 }
 
-void write_deck(char *filestr, struct deck *deck) {
+int write_deck(char *filestr, struct deck *deck) {
 	FILE *fp = fopen(filestr, "w+");
+	if (fp == 0) {
+		return 1;
+	}
 	for (int i = 0; i < deck->size; i++) {
 		struct card *card = deck->cards[i];
 		fprintf(fp, "%s\t%s\t%d\t%lu\n", card->front, card->back, card->intsum, (unsigned long)card->revday);
 	}
 	printf("%s", "Deck saved\n");
 	fclose(fp);
+	return 0;
 }

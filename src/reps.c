@@ -12,18 +12,20 @@ struct node {
 struct node *next_card;
 
 void add_rep(struct card *card);
-int next_interval(int intsum);
+int	next_interval(int intsum);
 
 int queue_count = 0;
 
-void add_rep_if_due(struct card *card) {
+void add_rep_if_due(struct card *card)
+{
 	if (card->revday <= time(0)) {
 		add_rep(card);
 	}
 }
 
-void add_rep(struct card *card) {
-	struct node *n = malloc(sizeof(struct node));
+void add_rep(struct card *card)
+{
+	struct node *n = calloc(1, sizeof(struct node));
 	n->val = card;
 	if (next_card == 0) {
 		n->prev = n;
@@ -43,7 +45,8 @@ void add_rep(struct card *card) {
 /*
  * Returns the next card in the queue.
  */
-struct card *next_rep() {
+struct card *next_rep()
+{
 	if (queue_count == 0) {
 		return 0;
 	}
@@ -61,7 +64,8 @@ struct card *next_rep() {
 	return result;
 }
 
-int next_interval(int intsum) {
+int next_interval(int intsum)
+{
 	if (intsum < 3) {
 		return 1;
 	}
@@ -80,7 +84,8 @@ int next_interval(int intsum) {
  * Changes card data and adds to queue based on if
  * the card was answered correctly or not.
  */
-void answer_card(enum answer ans, struct card *card) {
+void answer_card(enum answer ans, struct card *card)
+{
 	struct tm *timeptr = localtime(&card->revday);
 	int interval = 1;
 	if (ans == RIGHT) {

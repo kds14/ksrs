@@ -18,18 +18,21 @@ struct deck {
 };
 
 struct deck *deckptr;
+struct card *current;
 
-enum next_read { FRONT, BACK, INTSUM, REVDAY };
+enum next_read { RFRONT, RBACK, INTSUM, REVDAY };
 
-int read_deck(char *filestr);
+int	read_deck(char *filestr);
 int write_deck(char *filestr, struct deck *deck);
 void print_deck(struct deck *deck);
 void print_deck();
-void print_card();
+void print_card(struct card *card);
 
 void init_deck(int cap);
 void del_deck();
 void add_card(struct card *card);
 void create_card(char *front, char *back);
+
+char *deck_path;
 
 #endif

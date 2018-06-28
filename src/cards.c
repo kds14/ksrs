@@ -4,15 +4,16 @@
 #include "cards.h"
 #include "reps.h"
 
-void init_deck(int cap) {
+void init_deck(int cap)
+{
 	deckptr = calloc(1, sizeof(struct deck));
 	deckptr->cards = calloc(cap, sizeof(struct card *));
 	deckptr->cap = cap;
 	deckptr->size = 0;
 }
 
-// useless atm
-void create_card(char *front, char *back) {
+void create_card(char *front, char *back)
+{
 	struct card *card = calloc(1, sizeof(struct card));
 	card->front = front;
 	card->back = back;
@@ -26,7 +27,8 @@ void create_card(char *front, char *back) {
  * Adds a card to the current deck and the rep queue if
  * it is due.
  */
-void add_card(struct card *card) {
+void add_card(struct card *card)
+{
 
 	if (deckptr->size + 1 >= deckptr->cap) {
 		deckptr->cap *= 2;
@@ -38,14 +40,16 @@ void add_card(struct card *card) {
 	deckptr->cards[deckptr->size++] = card;
 }
 
-void print_deck(struct deck *deck) {
+void print_deck(struct deck *deck)
+{
 	for (int i = 0; i < deck->size; i++) {
 		printf("Card %d:\n", i);
-		print_card(&deck->cards[i]);
+		print_card(deck->cards[i]);
 	}
 }
 
-void print_card(struct card *card) {
+void print_card(struct card *card)
+{
 	printf("Front: %s\n", card->front);
 	printf("Back: %s\n", card->back);
 	printf("IntSum: %d\n", card->intsum);
@@ -60,14 +64,15 @@ void print_card(struct card *card) {
 /*
  * Reads all card data from a deck file and adds them to the deck.
  */
-int read_deck(char *filestr) {
+int read_deck(char *filestr)
+{
 	FILE *fp = fopen(filestr, "r");
 	if (fp == 0) {
 		return 1;
 	}
 	char buff[512];
 	memset(buff, 0, sizeof(buff));
-	enum next_read next = FRONT;
+	enum next_read next = RFRONT;
 	struct card *card;
 
 	init_deck(100);
@@ -79,13 +84,13 @@ int read_deck(char *filestr) {
 		int i = 0;
 		unsigned long int l = 0;
 		if (c == '\t' || c == '\n') {
-			/*if ((next == FRONT || next == BACK) && c == '\n') {
+			/*if ((next == RFRONT || next == BACK) && c == '\n') {
 				memset(buff, 0, sizeof(buff));
 				count = 0;
 				continue;
 			}*/
 			switch (next++) {
-				case FRONT:
+				case RFRONT:
 					card = calloc(1, sizeof(struct card));
 					card->back = 0;
 					card->revday = 0;
@@ -96,7 +101,7 @@ int read_deck(char *filestr) {
 						memcpy(card->front, buff, strlen(buff) + 1);
 					}
 					break;
-				case BACK:
+				case RBACK:
 					if (count > 0) {
 						card->back = malloc(strlen(buff) + 1);
 						memcpy(card->back, buff, strlen(buff) + 1);
@@ -130,7 +135,7 @@ int read_deck(char *filestr) {
 				else {
 					add_card(card);
 				}
-				next = FRONT;
+				next = RFRONT;
 			}
 			memset(buff, 0, sizeof(buff));
 			count = 0;
@@ -146,7 +151,8 @@ int read_deck(char *filestr) {
 	return 0;
 }
 
-int write_deck(char *filestr, struct deck *deck) {
+int write_deck(char *filestr, struct deck *deck)
+{
 	FILE *fp = fopen(filestr, "w+");
 	if (fp == 0) {
 		return 1;

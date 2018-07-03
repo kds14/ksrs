@@ -118,7 +118,7 @@ void handle_add(char c, struct app_state *aps)
 			aps->add_s = FRONT;
 		case FRONT:
 			if (c == 10) {
-				front = calloc(input_count, sizeof(char));
+				front = calloc(input_count + 1, sizeof(char));
 				memcpy(front, input_buffer, input_count);
 				input_count = 0;
 				aps->add_s = BACK;
@@ -129,7 +129,7 @@ void handle_add(char c, struct app_state *aps)
 			break;
 		case BACK:
 			if (c == 10) {
-				back = calloc(input_count, sizeof(char));
+				back = calloc(input_count + 1, sizeof(char));
 				memcpy(back, input_buffer, input_count);
 				create_card(front, back);
 				write_deck(deck_path, deckptr);
@@ -137,6 +137,7 @@ void handle_add(char c, struct app_state *aps)
 				front = 0;
 				back = 0;
 				free(input_buffer);
+				input_buffer = 0;
 				printf("Reps due: %d\n", queue_count);
 				printf("%s\n", "Do reps (Q), Add card (W)");
 			} else {

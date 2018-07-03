@@ -4,6 +4,8 @@
 #include "cards.h"
 #include "reps.h"
 
+enum next_read { FCOUNT, BCOUNT, INTSUM, REVDAY };
+
 void init_deck(int cap)
 {
 	deckptr = calloc(1, sizeof(struct deck));
@@ -70,59 +72,98 @@ int read_deck(char *filestr)
 	if (fp == 0) {
 		return 1;
 	}
-	char buff[512];
-	memset(buff, 0, sizeof(buff));
-	enum next_read next = RFRONT;
-	struct card *card;
+	char *buff = (char *) calloc(512, sizeof(char));;
+	enum next_read next = FCOUNT;
 
 	init_deck(100);
 
 	char c;
 	int count = 0;
-	char *num_buff;
-	while ((c = fgetc(fp)) != EOF) {
+	char *num_buff = 0;
+	struct card *card;
+	int succ = 1;
+
+	int fcount = 0;
+	int bcount = 0;
+
+	while ((c = fgetc(fp)) != EOF && succ) {
 		int i = 0;
 		unsigned long int l = 0;
-		if (c == '\t' || c == '\n') {
-			/*if ((next == RFRONT || next == BACK) && c == '\n') {
-				memset(buff, 0, sizeof(buff));
-				count = 0;
-				continue;
-			}*/
+		if (c == ',' || c == '\n') {
 			switch (next++) {
-				case RFRONT:
+				case FCOUNT:
 					card = calloc(1, sizeof(struct card));
+					card->front = 0;
 					card->back = 0;
 					card->revday = 0;
 					card->intsum = 0;
-					card->front = 0;
-					if (count > 0) {
-						card->front = malloc(strlen(buff) + 1);
-						memcpy(card->front, buff, strlen(buff) + 1);
+
+					if (count < 1) {
+						printf("%s", "Error loading card\n");
+						return 1;
 					}
+					num_buff = calloc(count + 1, sizeof(char));
+					memcpy(num_buff, buff, count * sizeof(char));
+					fcount = 0;
+					bcount = 0;
+					sscanf(num_buff, "%5d", &fcount);
+					free(num_buff);
+					num_buff = 0;
 					break;
-				case RBACK:
-					if (count > 0) {
-						card->back = malloc(strlen(buff) + 1);
-						memcpy(card->back, buff, strlen(buff) + 1);
+				case BCOUNT:
+					if (count < 1) {
+						printf("%s", "Error loading card\n");
+						return 1;
 					}
+					num_buff = calloc(count + 1, sizeof(char));
+					memcpy(num_buff, buff, count * sizeof(char));
+					sscanf(num_buff, "%5d", &bcount);
+					free(num_buff);
+					num_buff = 0;
+					if (bcount == 0 || fcount == 0) {
+						succ = 0;
+						break;
+					}
+					card->front = calloc(fcount + 1, sizeof(char));
+					for (int i = 0; i < fcount; i++) {
+						c = fgetc(fp);
+						if (c == EOF) {
+							succ = 0;
+						}
+						card->front[i] = c;
+					}
+					fgetc(fp);
+					card->back = calloc(bcount + 1, sizeof(char));
+					for (int i = 0; i < bcount; i++) {
+						c = fgetc(fp);
+						if (c == EOF) {
+							succ = 0;
+						}
+						card->back[i] = c;
+					}
+					c = fgetc(fp);
 					break;
 				case INTSUM:
-					//num_buff = malloc(count * sizeof(char));
-					num_buff = calloc(count, sizeof(char));
-					memcpy(num_buff, buff, count * sizeof(char));
-					sscanf(num_buff, "%d", &i);
-					card->intsum = i;
-					i = 0;
-					free(num_buff);
+					if (count > 0) {
+						num_buff = calloc(count+ 1, sizeof(char));
+						memcpy(num_buff, buff, count * sizeof(char));
+						sscanf(num_buff, "%5d", &i);
+						free(num_buff);
+						num_buff = 0;
+						card->intsum = i;
+						i = 0;
+					}
 					break;
 				case REVDAY:
-					num_buff = calloc(count, sizeof(char));
-					memcpy(num_buff, buff, count * sizeof(char));
-					sscanf(num_buff, "%lu", &l);
-					card->revday = (time_t)l;
-					l = 0;
-					free(num_buff);
+					if (count > 0) {
+						num_buff = calloc(count + 1, sizeof(char));
+						memcpy(num_buff, buff, count * sizeof(char));
+						sscanf(num_buff, "%lu", &l);
+						free(num_buff);
+						num_buff = 0;
+						card->revday = (time_t)l;
+						l = 0;
+					}
 					break;
 			}
 			if (c == '\n') {
@@ -130,36 +171,41 @@ int read_deck(char *filestr)
 					card->revday = time(0);
 				}
 				if (card->front == 0 || card->back == 0) {
-					printf("%s", "Failed to add card. Must have a front and back.");
+					printf("%s\n", "Failed to add card. Must have a front and back.");
 				}
 				else {
 					add_card(card);
 				}
-				next = RFRONT;
+				next = FCOUNT;
 			}
-			memset(buff, 0, sizeof(buff));
+			free(buff);
+			buff = calloc(512, sizeof(char));;
 			count = 0;
 		} else {
 			buff[count++] = c;
 		}
 	}
 
+	free(buff);
+
 	for (int i = 0; i < deckptr->size; i++) {
 		add_rep_if_due(deckptr->cards[i]);
 	}
+
 	fclose(fp);
-	return 0;
+	return !succ;
 }
 
 int write_deck(char *filestr, struct deck *deck)
 {
+	//+
 	FILE *fp = fopen(filestr, "w+");
 	if (fp == 0) {
 		return 1;
 	}
 	for (int i = 0; i < deck->size; i++) {
 		struct card *card = deck->cards[i];
-		fprintf(fp, "%s\t%s\t%d\t%lu\n", card->front, card->back, card->intsum, (unsigned long)card->revday);
+		fprintf(fp, "%lu,%lu,%s,%s,%d,%lu\n", strlen(card->front), strlen(card->back), card->front, card->back, card->intsum, (unsigned long)card->revday);
 	}
 	printf("%s", "Deck saved\n");
 	fclose(fp);

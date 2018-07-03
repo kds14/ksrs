@@ -53,10 +53,12 @@ struct card *next_rep()
 	struct card *result = next_card->val;
 	if (next_card->prev == next_card) {
 		free(next_card);
+		next_card = 0;
 	} else {
 		struct node *rear = next_card->prev;
 		rear->next = next_card->next;
 		free(next_card);
+		next_card = 0;
 		next_card = rear->next;
 		next_card->prev = rear;
 	}

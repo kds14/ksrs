@@ -20,7 +20,6 @@ struct deck {
 struct deck *deckptr;
 struct card *current;
 
-enum next_read { RFRONT, RBACK, INTSUM, REVDAY };
 
 int	read_deck(char *filestr);
 int write_deck(char *filestr, struct deck *deck);

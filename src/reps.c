@@ -58,7 +58,6 @@ struct card *next_rep()
 		struct node *rear = next_card->prev;
 		rear->next = next_card->next;
 		free(next_card);
-		next_card = 0;
 		next_card = rear->next;
 		next_card->prev = rear;
 	}

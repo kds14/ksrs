@@ -7,12 +7,9 @@
 struct card *display_rep()
 {
 	struct card *card = next_rep();
-	printf("%s\n", "------------");
+	printf("%s", "------------\n");
 	if (card != 0) {
-		printf("%s\n", card->front);
-		printf("%s\n", "------------");
-	} else {
-		printf("%s\n", "No reps due!");
+		printf("%s\n%s", card->front, "------------\n");
 	}
 	return card;
 }
@@ -65,6 +62,7 @@ void handle_reps(char c, struct app_state *aps)
 		if (aps->card_s == BACK) {
 			answer_card(RIGHT, current);
 			aps->card_s = FRONT;
+			printf("%s%d\n", "------------\nReps due: ", queue_count);
 			current = display_rep();
 			if (!current) {
 				aps->in_s = MAIN;

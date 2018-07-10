@@ -18,7 +18,7 @@ int queue_count = 0;
 
 void add_rep_if_due(struct card *card)
 {
-	if (card->revday <= time(0)) {
+	if (mktime(card->revday) <= time(0)) {
 		add_rep(card);
 	}
 }
@@ -87,7 +87,6 @@ int next_interval(int intsum)
  */
 void answer_card(enum answer ans, struct card *card)
 {
-	struct tm *timeptr = localtime(&card->revday);
 	int interval = 1;
 	if (ans == RIGHT) {
 		interval = next_interval(card->intsum);
@@ -96,6 +95,6 @@ void answer_card(enum answer ans, struct card *card)
 		card->intsum = 1;
 		add_rep(card);
 	}
-	timeptr->tm_mday +=  interval;
-	card->revday = mktime(timeptr);
+	set_current_time(card);
+	card->revday->tm_mday += interval;
 }

@@ -39,7 +39,7 @@ int main(int argc, char **argv)
 	aps = calloc(1, sizeof(struct app_state));
 	aps->in_s = MAIN;
 	aps->card_s = FRONT;
-	aps->add_s = INIT;
+	aps->add_s = FRONT;
 	aps->getc_s = SING;
 
 	int deck = 1;
@@ -66,7 +66,9 @@ int main(int argc, char **argv)
 				handle_reps(c, aps);
 				break;
 			case ADD:
-				handle_add(c, aps);
+				if (handle_add(c, aps)) {
+					aps->getc_s = SING;
+				}
 				break;
 		}
 	}

@@ -4,6 +4,30 @@
 #include "ui.h"
 #include "reps.h"
 
+int input_count = 0;
+char *input_buffer = 0;
+char *front = 0;
+char *back = 0;
+int input_max = 1024;
+
+/* Cleans up input buffers */
+void clean_in_buffs()
+{
+	if (front) {
+		free(front);
+		front = 0;
+	}
+	if (back) {
+		free(back);
+		back = 0;
+	}
+	if (input_buffer) {
+		free(input_buffer);
+		input_buffer = 0;
+	}
+}
+
+
 struct card *display_rep()
 {
 	struct card *card = next_rep();
@@ -50,8 +74,11 @@ void handle_main(char c, struct app_state *aps)
 		}
 	} else if (c == 'W' || c == 'w') {
 		aps->in_s = ADD;
-		aps->add_s = INIT;
 		aps->getc_s = REG;
+		clean_in_buffs();
+		input_count = 0;
+		input_buffer = calloc(input_max + 1, sizeof(char));
+		aps->add_s = FRONT;
 		printf("%s\n", "Input front:");
 	}
 }
@@ -69,6 +96,7 @@ void handle_reps(char c, struct app_state *aps)
 				if (write_deck(deck_path, deckptr)) {
 					printf("%s\n", "Failed to write deck.");
 				}
+				printf("%s\n", "Do reps (Q), Add card (W)");
 			}
 		} else {
 			display_back_rep(current);
@@ -81,39 +109,14 @@ void handle_reps(char c, struct app_state *aps)
 	}
 }
 
-int input_count = 0;
-char *input_buffer = 0;
-char *front = 0;
-char *back = 0;
-
-/* Cleans up input buffers */
-void clean_in_buffs()
-{
-	if (front) {
-		free(front);
-		front = 0;
-	}
-	if (back) {
-		free(back);
-		back = 0;
-	}
-	if (input_buffer) {
-		free(input_buffer);
-		input_buffer = 0;
-	}
-}
-
-void handle_add(char c, struct app_state *aps)
+int handle_add(char c, struct app_state *aps)
 {
 	if (c == 'C' || c == 'c') {
+		aps->getc_s = SING;
 		clean_in_buffs();
+		return 0;
 	}
 	switch (aps->add_s) {
-		case INIT:
-			clean_in_buffs();
-			input_count = 0;
-			input_buffer = calloc(1024, sizeof(char));
-			aps->add_s = FRONT;
 		case FRONT:
 			if (c == 10) {
 				front = calloc(input_count + 1, sizeof(char));
@@ -122,6 +125,10 @@ void handle_add(char c, struct app_state *aps)
 				aps->add_s = BACK;
 				printf("%s\n", "Input back:");
 			} else {
+				if (input_count >= input_max) {
+					printf("Input buffer overflow. Failed to add\n");
+					return 1;
+				}
 				input_buffer[input_count++] = c;
 			}
 			break;
@@ -136,12 +143,19 @@ void handle_add(char c, struct app_state *aps)
 				back = 0;
 				free(input_buffer);
 				input_buffer = 0;
+				input_count = 0;
 				printf("Reps due: %d\n", queue_count);
 				printf("%s\n", "Do reps (Q), Add card (W)");
+				// FIX
+				aps->getc_s = SING;
 			} else {
+				if (input_count >= input_max) {
+					printf("Input buffer overflow. Failed to add\n");
+					return 1;
+				}
 				input_buffer[input_count++] = c;
 			}
-			aps->getc_s = SING;
 			break;
 	}
+	return 0;
 }

@@ -6,7 +6,7 @@
 
 struct card {
 	int intsum;
-	time_t revday;
+	struct tm *revday;
 	char *front;
 	char *back;
 };
@@ -26,6 +26,7 @@ int write_deck(char *filestr, struct deck *deck);
 void print_deck(struct deck *deck);
 void print_deck();
 void print_card(struct card *card);
+void set_current_time(struct card *card);
 
 void init_deck(int cap);
 void del_deck();

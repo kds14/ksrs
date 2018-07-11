@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">ksrs</string>
+    <string name="reps_button">Reps</string>
+    <string name="edit_button">Edit</string>
+    <string name="load_button">Load</string>
+    <string name="no_deck_loaded_msg">No deck loaded!</string>
 </resources>

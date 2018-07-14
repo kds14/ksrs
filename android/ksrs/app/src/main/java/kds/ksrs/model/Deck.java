@@ -1,10 +1,20 @@
 package kds.ksrs.model;
 
+import android.annotation.TargetApi;
+import android.os.Build;
+
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Objects;
 
 public class Deck {
     private final ArrayList<Card> cards = new ArrayList<Card>();
+    private String name;
+
+    public Deck(String name) {
+        this.name = name;
+    }
 
     public int getSize() {
         return cards.size();
@@ -20,5 +30,38 @@ public class Deck {
 
     public Iterator<Card> getIterator() {
         return cards.iterator();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Deck deck = (Deck) o;
+        return Objects.equals(new HashSet<>(cards), new HashSet<>(deck.cards)) &&
+                Objects.equals(name, deck.name);
+    }
+
+    @Override
+    public String toString() {
+        return "Deck{" +
+                "cards=" + cards +
+                ", name='" + name + '\'' +
+                '}';
+    }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(cards, name);
     }
 }

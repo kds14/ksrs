@@ -4,4 +4,5 @@
     <string name="edit_button">Edit</string>
     <string name="load_button">Load</string>
     <string name="no_deck_loaded_msg">No deck loaded!</string>
+    <string name="loaded_deck_msg">Deck:</string>
 </resources>

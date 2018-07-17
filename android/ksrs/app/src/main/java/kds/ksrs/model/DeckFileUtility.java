@@ -1,6 +1,7 @@
 package kds.ksrs.model;
 
 import android.content.Context;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -10,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.util.Iterator;
@@ -31,7 +33,7 @@ public final class DeckFileUtility {
         return ReadDeckFile(fileName, inStream);
     }
 
-    private static Deck ReadDeckFile(String fileName, FileInputStream inStream) throws IOException, JSONException, ParseException {
+    public static Deck ReadDeckFile(String fileName, InputStream inStream) throws IOException, JSONException, ParseException {
         InputStreamReader inputStreamReader = new InputStreamReader(inStream, "UTF-8");
         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
         StringBuilder stringBuilder = new StringBuilder();
@@ -59,7 +61,7 @@ public final class DeckFileUtility {
     public static void WriteDeckFile(String fileName, Context context, Deck deck) throws IOException, JSONException {
         JSONObject jsonObj = CreateDeckJSON(deck);
         FileOutputStream outStream = context.openFileOutput(fileName, context.MODE_PRIVATE);
-        //Log.d("JSONOBJ WRITE", jsonObj.toString());
+        Log.d("JSONOBJ WRITE", jsonObj.toString());
         outStream.write(jsonObj.toString().getBytes());
         outStream.close();
     }

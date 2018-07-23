@@ -17,6 +17,10 @@ public class RepManager {
 
     public RepManager() { }
 
+    public int getRepsDue() {
+        return reps.size();
+    }
+
     public void generateReps(final Deck deck) {
         reps = new LinkedList<>();
         final Iterator<Card> it = deck.getIterator();

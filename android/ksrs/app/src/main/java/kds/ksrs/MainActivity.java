@@ -19,12 +19,15 @@ import java.text.ParseException;
 
 import kds.ksrs.m.Deck;
 import kds.ksrs.m.DeckFileUtility;
+import kds.ksrs.m.RepManager;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final int JSON_REQ_CODE = 1;
     // no application/json
     private static final String JSON_MIME_TYPE = "application/octet-stream";
+    private final RepManager repManager = new RepManager();
+    private Deck currentDeck = null;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -45,7 +48,8 @@ public class MainActivity extends AppCompatActivity {
 
     private String getFileNameFromUri(final Uri uri) {
         String fileName = null;
-        final Cursor cursor = getContentResolver().query(uri, null, null, null, null, null);
+        final Cursor cursor = getContentResolver().query(uri, null, null,
+               null, null, null);
         if (cursor != null && cursor.moveToFirst()) {
             fileName = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
         }
@@ -67,21 +71,28 @@ public class MainActivity extends AppCompatActivity {
         textView.setText(newText);
     }
 
+    private void onJsonRead(final Intent data) throws IOException, JSONException, ParseException {
+        final String fileName = getFileNameFromUri(data.getData());
+        if (fileName == null) {
+            // TODO: Handle null file
+            Log.d("ERROR", "FILE DID NOT LOAD");
+            return;
+        }
+        final InputStream inStream = getContentResolver().openInputStream(data.getData());
+        currentDeck = DeckFileUtility.ReadDeckFile(fileName, inStream);
+        repManager.generateReps(currentDeck);
+        changeTitleText(getString(R.string.loaded_deck_msg) + " "
+                + currentDeck.getName() + "\n" + getString(R.string.reps_due_msg)
+                + " " + repManager.getRepsDue());
+    }
+
     @Override
     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
         if (requestCode == JSON_REQ_CODE) {
             if (resultCode == RESULT_OK) {
                 boolean succ = true;
                 try {
-                    final String fileName = getFileNameFromUri(data.getData());
-                    if (fileName == null) {
-                        // TODO: Handle null file
-                        Log.d("ERROR", "FILE DID NOT LOAD");
-                        return;
-                    }
-                    final InputStream inStream = getContentResolver().openInputStream(data.getData());
-                    final Deck deck = DeckFileUtility.ReadDeckFile(fileName, inStream);
-                    changeTitleText(getString(R.string.loaded_deck_msg) + " " + deck.getName());
+                    onJsonRead(data);
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                     succ = false;

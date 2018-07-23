@@ -40,7 +40,6 @@ public class Deck {
         this.name = name;
     }
 
-    @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -58,10 +57,8 @@ public class Deck {
                 '}';
     }
 
-    @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     public int hashCode() {
-
         return Objects.hash(cards, name);
     }
 }

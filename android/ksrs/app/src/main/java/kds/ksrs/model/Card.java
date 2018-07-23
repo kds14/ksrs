@@ -5,6 +5,9 @@ import android.os.Build;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
@@ -12,10 +15,12 @@ import java.util.Objects;
 public class Card {
     private String front;
     private String back;
-    private Date dueDate;
+    private LocalDateTime dueDate;
     private int intervalSum = 0;
 
-    public Card (String front, String back, int intervalSum, Date dueDate) {
+    private final static DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+    public Card (String front, String back, int intervalSum, LocalDateTime dueDate) {
         this.front = front;
         this.back = back;
         this.dueDate = dueDate;
@@ -32,7 +37,7 @@ public class Card {
     public Card (String front, String back) {
         this.front = front;
         this.back = back;
-        dueDate = Calendar.getInstance().getTime();
+        dueDate = LocalDateTime.now().withSecond(0).withMinute(0).withHour(0);
     }
 
     public String getFront() {
@@ -51,11 +56,11 @@ public class Card {
         back = value;
     }
 
-    public Date getDueDate() {
+    public LocalDateTime getDueDate() {
         return dueDate;
     }
 
-    public void setDueDate(Date dueDate) {
+    public void setDueDate(LocalDateTime dueDate) {
         this.dueDate = dueDate;
     }
 
@@ -70,13 +75,16 @@ public class Card {
     public String getDueDateString() {
         if (dueDate == null)
             return null;
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        return simpleDateFormat.format(dueDate);
+        return dueDate.format(dateTimeFormatter);
     }
 
     public void setDueDateString(String dueDateString) throws ParseException {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        dueDate = simpleDateFormat.parse(dueDateString);
+        dueDate = LocalDateTime.parse(dueDateString, dateTimeFormatter);
+    }
+
+    public boolean isDue() {
+        LocalDateTime now = LocalDateTime.now();
+        return dueDate.isBefore(now) || dueDate.isEqual(now);
     }
 
     @Override
@@ -89,7 +97,6 @@ public class Card {
                 '}';
     }
 
-    @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -101,7 +108,6 @@ public class Card {
                 Objects.equals(getDueDateString(), card.getDueDateString());
     }
 
-    @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     public int hashCode() {
 

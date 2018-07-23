@@ -26,10 +26,11 @@ import kds.ksrs.model.DeckFileUtility;
 public class MainActivity extends AppCompatActivity {
 
     private static final int JSON_REQ_CODE = 1;
+    // no application/json
+    private static final String JSON_MIME_TYPE = "application/octet-stream";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d("ONCREATE","ONCREATE");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
     }
@@ -39,25 +40,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void searchForJSONFiles() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        final Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("application/octet-stream");
+        intent.setType(JSON_MIME_TYPE);
         startActivityForResult(intent, JSON_REQ_CODE);
     }
 
     private String getFileNameFromUri(Uri uri) {
         String fileName = null;
-        Cursor cursor = getContentResolver().query(uri, null, null, null, null, null);
+        final Cursor cursor = getContentResolver().query(uri, null, null, null, null, null);
         if (cursor != null && cursor.moveToFirst()) {
             fileName = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
         }
         cursor.close();
         if (fileName == null) {
-            String[] tokens = uri.getLastPathSegment().split("\\/");
+            final String[] tokens = uri.getLastPathSegment().split("\\/");
             fileName = tokens[tokens.length - 1];
         }
-        String[] extTokens = fileName.split("\\.");
-        String ext = extTokens[extTokens.length - 1];
+        final String[] extTokens = fileName.split("\\.");
+        final String ext = extTokens[extTokens.length - 1];
         if (!ext.toLowerCase().equals("json")) {
             fileName = null;
         }
@@ -65,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void changeTitleText(String newText) {
-        TextView textView = (TextView)findViewById(R.id.textView);
+        final TextView textView = (TextView)findViewById(R.id.textView);
         textView.setText(newText);
     }
 
@@ -75,16 +76,15 @@ public class MainActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 boolean succ = true;
                 try {
-                    String fileName = getFileNameFromUri(data.getData());
+                    final String fileName = getFileNameFromUri(data.getData());
                     if (fileName == null) {
                         // TODO: Handle null file
                         Log.d("ERROR", "FILE DID NOT LOAD");
                         return;
                     }
-                    InputStream inStream = getContentResolver().openInputStream(data.getData());
+                    final InputStream inStream = getContentResolver().openInputStream(data.getData());
                     Deck deck = DeckFileUtility.ReadDeckFile(fileName, inStream);
                     changeTitleText(getString(R.string.loaded_deck_msg) + " " + deck.getName());
-                    Log.d("DECK_RESULT", deck.toString());
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                     succ = false;

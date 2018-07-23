@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Objects;
 
-public final class Deck {
+public class Deck {
     private final ArrayList<Card> cards = new ArrayList<Card>();
     private String name;
 
@@ -38,10 +38,10 @@ public final class Deck {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Deck deck = (Deck) o;
+        final Deck deck = (Deck) o;
         return Objects.equals(new HashSet<>(cards), new HashSet<>(deck.cards)) &&
                 Objects.equals(name, deck.name);
     }

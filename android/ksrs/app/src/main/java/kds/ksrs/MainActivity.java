@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String JSON_MIME_TYPE = "application/octet-stream";
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
     }
@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, JSON_REQ_CODE);
     }
 
-    private String getFileNameFromUri(Uri uri) {
+    private String getFileNameFromUri(final Uri uri) {
         String fileName = null;
         final Cursor cursor = getContentResolver().query(uri, null, null, null, null, null);
         if (cursor != null && cursor.moveToFirst()) {
@@ -62,13 +62,13 @@ public class MainActivity extends AppCompatActivity {
         return fileName;
     }
 
-    private void changeTitleText(String newText) {
+    private void changeTitleText(final String newText) {
         final TextView textView = (TextView)findViewById(R.id.textView);
         textView.setText(newText);
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
         if (requestCode == JSON_REQ_CODE) {
             if (resultCode == RESULT_OK) {
                 boolean succ = true;
@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
                         return;
                     }
                     final InputStream inStream = getContentResolver().openInputStream(data.getData());
-                    Deck deck = DeckFileUtility.ReadDeckFile(fileName, inStream);
+                    final Deck deck = DeckFileUtility.ReadDeckFile(fileName, inStream);
                     changeTitleText(getString(R.string.loaded_deck_msg) + " " + deck.getName());
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();

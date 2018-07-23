@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
-public final class Card {
+public class Card {
     private String front;
     private String back;
     private LocalDate dueDate;
@@ -13,21 +13,21 @@ public final class Card {
 
     private final static DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public Card (String front, String back, int intervalSum, LocalDate dueDate) {
+    public Card (final String front, final String back, final int intervalSum, final LocalDate dueDate) {
         this.front = front;
         this.back = back;
         this.dueDate = dueDate;
         this.intervalSum = intervalSum;
     }
 
-    public Card (String front, String back, int intervalSum, String dueDate) throws ParseException {
+    public Card (final String front, final String back, final int intervalSum, final String dueDate) throws ParseException {
         this.front = front;
         this.back = back;
         this.intervalSum = intervalSum;
         setDueDateString(dueDate);
     }
 
-    public Card (String front, String back) {
+    public Card (final String front, final String back) {
         this.front = front;
         this.back = back;
         dueDate = LocalDate.now();
@@ -37,7 +37,7 @@ public final class Card {
         return front;
     }
 
-    public void setFront(String value) {
+    public void setFront(final String value) {
         front = value;
     }
 
@@ -45,7 +45,7 @@ public final class Card {
         return back;
     }
 
-    public void setBack(String value) {
+    public void setBack(final String value) {
         back = value;
     }
 
@@ -53,7 +53,7 @@ public final class Card {
         return dueDate;
     }
 
-    public void setDueDate(LocalDate dueDate) {
+    public void setDueDate(final LocalDate dueDate) {
         this.dueDate = dueDate;
     }
 
@@ -61,7 +61,7 @@ public final class Card {
         return intervalSum;
     }
 
-    public void setIntervalSum(int intervalSum) {
+    public void setIntervalSum(final int intervalSum) {
         this.intervalSum = intervalSum;
     }
 
@@ -71,12 +71,12 @@ public final class Card {
         return dueDate.format(dateTimeFormatter);
     }
 
-    public void setDueDateString(String dueDateString) throws ParseException {
+    public void setDueDateString(final String dueDateString) throws ParseException {
         dueDate = LocalDate.parse(dueDateString, dateTimeFormatter);
     }
 
     public boolean isDue() {
-        LocalDate now = LocalDate.now();
+        final LocalDate now = LocalDate.now();
         return dueDate.isBefore(now) || dueDate.isEqual(now);
     }
 
@@ -91,10 +91,10 @@ public final class Card {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Card card = (Card) o;
+        final Card card = (Card) o;
         return intervalSum == card.intervalSum &&
                 Objects.equals(front, card.front) &&
                 Objects.equals(back, card.back) &&
@@ -103,7 +103,6 @@ public final class Card {
 
     @Override
     public int hashCode() {
-
         return Objects.hash(front, back, getDueDateString(), intervalSum);
     }
 }

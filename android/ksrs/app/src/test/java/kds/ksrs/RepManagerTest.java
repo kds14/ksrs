@@ -2,13 +2,13 @@ package kds.ksrs;
 
 import org.junit.Test;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import kds.ksrs.model.Card;
-import kds.ksrs.model.Deck;
-import kds.ksrs.model.RepManager;
+import kds.ksrs.m.Card;
+import kds.ksrs.m.Deck;
+import kds.ksrs.m.RepManager;
 
 import static org.junit.Assert.assertEquals;
 
@@ -53,7 +53,7 @@ public class RepManagerTest {
     @Test
     public void addCardIfDue_AddsOnlyDueCards() {
         Deck deck = new Deck("test0");
-        LocalDateTime now = LocalDateTime.now().withMinute(0).withSecond(0).withHour(0);
+        LocalDate now = LocalDate.now();
         Card cardBef = new Card("FRONT", "BACK", 5, now.minusDays(1));
         Card cardNow = new Card("FRONT1", "BACK", 5, now);
         Card cardAft = new Card("FRONT2", "BACK", 5, now.plusDays(1));
@@ -70,7 +70,7 @@ public class RepManagerTest {
     @Test
     public void answerRep_IncreasesDueDateProperly() {
         Deck deck = new Deck("test0");
-        LocalDateTime now = LocalDateTime.now().withMinute(0).withSecond(0).withHour(0).minusDays(15);
+        LocalDate now = LocalDate.now();
         int[] days = {1, 1, 1, 1, 2, 3, 4, 6, 8, 11, 15, 20, 27, 36, 47, 62};
         int[] sums = {0, 1, 2, 3, 4, 6, 9, 13, 19, 27, 38, 53, 73, 100, 136, 183};
         for (int i = 0; i < 15; i++) {
@@ -83,7 +83,7 @@ public class RepManagerTest {
         for (int i = 0; i < 15; i++) {
             Card card = it.next();
             rm.answerRep(RepManager.Answer.RIGHT, card);
-            LocalDateTime expectedTime = LocalDateTime.now().plusDays(days[i]).withMinute(0).withSecond(0).withHour(0);
+            LocalDate expectedTime = LocalDate.now().plusDays(days[i]);
             assertEquals(sums[i+1], card.getIntervalSum());
             assertEquals(expectedTime.getDayOfMonth(), card.getDueDate().getDayOfMonth());
             assertEquals(expectedTime.getMonth(), card.getDueDate().getMonth());
@@ -94,7 +94,7 @@ public class RepManagerTest {
     @Test
     public void answerRep_DecreasesDueDateProperly() {
         Deck deck = new Deck("test0");
-        LocalDateTime now = LocalDateTime.now().withMinute(0).withSecond(0).withHour(0).minusDays(15);
+        LocalDate now = LocalDate.now();
         int[] sums = {0, 1, 2, 3, 4, 6, 9, 13, 19, 27, 38, 53, 73, 100, 136, 183};
         for (int i = 0; i < 15; i++) {
             Card card = new Card("FRONT", "BACK", sums[i], now);
@@ -106,7 +106,7 @@ public class RepManagerTest {
         for (int i = 0; i < 15; i++) {
             Card card = it.next();
             rm.answerRep(RepManager.Answer.WRONG, card);
-            LocalDateTime expectedTime = LocalDateTime.now().withMinute(0).withSecond(0).withHour(0);
+            LocalDate expectedTime = LocalDate.now();
             assertEquals(0, card.getIntervalSum());
             assertEquals(expectedTime.getDayOfMonth(), card.getDueDate().getDayOfMonth());
             assertEquals(expectedTime.getMonth(), card.getDueDate().getMonth());

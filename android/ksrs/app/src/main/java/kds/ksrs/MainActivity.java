@@ -3,14 +3,11 @@ package kds.ksrs;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.provider.OpenableColumns;
-import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 
 import org.json.JSONException;
@@ -20,8 +17,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 
-import kds.ksrs.model.Deck;
-import kds.ksrs.model.DeckFileUtility;
+import kds.ksrs.m.Deck;
+import kds.ksrs.m.DeckFileUtility;
 
 public class MainActivity extends AppCompatActivity {
 

@@ -1,26 +1,19 @@
-package kds.ksrs.model;
-
-import android.annotation.TargetApi;
-import android.os.Build;
+package kds.ksrs.m;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Objects;
 
-public class Card {
+public final class Card {
     private String front;
     private String back;
-    private LocalDateTime dueDate;
+    private LocalDate dueDate;
     private int intervalSum = 0;
 
     private final static DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public Card (String front, String back, int intervalSum, LocalDateTime dueDate) {
+    public Card (String front, String back, int intervalSum, LocalDate dueDate) {
         this.front = front;
         this.back = back;
         this.dueDate = dueDate;
@@ -37,7 +30,7 @@ public class Card {
     public Card (String front, String back) {
         this.front = front;
         this.back = back;
-        dueDate = LocalDateTime.now().withSecond(0).withMinute(0).withHour(0);
+        dueDate = LocalDate.now();
     }
 
     public String getFront() {
@@ -56,11 +49,11 @@ public class Card {
         back = value;
     }
 
-    public LocalDateTime getDueDate() {
+    public LocalDate getDueDate() {
         return dueDate;
     }
 
-    public void setDueDate(LocalDateTime dueDate) {
+    public void setDueDate(LocalDate dueDate) {
         this.dueDate = dueDate;
     }
 
@@ -79,11 +72,11 @@ public class Card {
     }
 
     public void setDueDateString(String dueDateString) throws ParseException {
-        dueDate = LocalDateTime.parse(dueDateString, dateTimeFormatter);
+        dueDate = LocalDate.parse(dueDateString, dateTimeFormatter);
     }
 
     public boolean isDue() {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDate now = LocalDate.now();
         return dueDate.isBefore(now) || dueDate.isEqual(now);
     }
 

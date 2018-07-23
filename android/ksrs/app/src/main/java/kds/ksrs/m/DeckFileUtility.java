@@ -1,4 +1,4 @@
-package kds.ksrs.model;
+package kds.ksrs.m;
 
 import android.content.Context;
 import android.util.Log;

@@ -1,6 +1,6 @@
-package kds.ksrs.model;
+package kds.ksrs.m;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -26,7 +26,7 @@ public final class RepManager {
     }
 
     private void addCardIfDue(Card card) {
-        LocalDateTime now = LocalDateTime.now().withMinute(0).withSecond(0).withHour(0);
+        LocalDate now = LocalDate.now();
         if (card.isDue()) {
             reps.add(card);
         }
@@ -41,7 +41,7 @@ public final class RepManager {
             setNextDueDate(card);
         } else {
             card.setIntervalSum(0);
-            card.setDueDate(LocalDateTime.now().withSecond(0).withMinute(0).withHour(0));
+            card.setDueDate(LocalDate.now());
             reps.add(card);
         }
     }
@@ -63,7 +63,7 @@ public final class RepManager {
 
     private void setNextDueDate(Card card) {
         int interval = nextInterval(card.getIntervalSum());
-        LocalDateTime next = LocalDateTime.now().plusDays(interval).withSecond(0).withMinute(0).withHour(0);
+        LocalDate next = LocalDate.now().plusDays(interval);
         card.setDueDate(next);
         card.setIntervalSum(card.getIntervalSum() + interval);
     }

@@ -1,14 +1,11 @@
-package kds.ksrs.model;
-
-import android.annotation.TargetApi;
-import android.os.Build;
+package kds.ksrs.m;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Objects;
 
-public class Deck {
+public final class Deck {
     private final ArrayList<Card> cards = new ArrayList<Card>();
     private String name;
 

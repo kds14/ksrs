@@ -12,9 +12,9 @@ import org.junit.runner.RunWith;
 import java.io.IOException;
 import java.text.ParseException;
 
-import kds.ksrs.model.Card;
-import kds.ksrs.model.Deck;
-import kds.ksrs.model.DeckFileUtility;
+import kds.ksrs.m.Card;
+import kds.ksrs.m.Deck;
+import kds.ksrs.m.DeckFileUtility;
 
 import static org.junit.Assert.assertEquals;
 

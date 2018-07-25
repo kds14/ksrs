@@ -6,4 +6,8 @@
     <string name="no_deck_loaded_msg">No deck loaded!</string>
     <string name="loaded_deck_msg">Deck:</string>
     <string name="reps_due_msg">Reps Due:</string>
+    <string name="no_reps_dialog_msg">There are no reps due today.</string>
+    <string name="no_reps_dialog_title">No reps</string>
+    <string name="no_deck_loaded_dialog_msg">Load a deck through the load  button first.</string>
+    <string name="no_deck_loaded_dialog_title">No deck loaded</string>
 </resources>

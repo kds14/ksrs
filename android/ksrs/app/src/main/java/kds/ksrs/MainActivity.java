@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.OpenableColumns;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -37,6 +38,19 @@ public class MainActivity extends AppCompatActivity {
 
     public void onLoadClick(View v) {
         searchForJSONFiles();
+    }
+
+    public void onRepsClick(View v) {
+        Log.d("REP", "REP_CLICK");
+        if (currentDeck == null) {
+            Log.d("NO DECK", "NO DECK");
+            createSingleButtonDialog(R.string.no_deck_loaded_dialog_msg, R.string.no_deck_loaded_dialog_title);
+        } else if (repManager.getRepsDue() == 0) {
+            createSingleButtonDialog(R.string.no_reps_dialog_msg, R.string.no_reps_dialog_title);
+            Log.d("NO REPS", "NO REPS");
+        } else {
+            startActivity(new Intent(MainActivity.this, RepActivity.class));
+        }
     }
 
     private void searchForJSONFiles() {
@@ -112,5 +126,11 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    private void createSingleButtonDialog(int msg, int title) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(msg).setTitle(title);
+        builder.create().show();
     }
 }
